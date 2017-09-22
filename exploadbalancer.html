@@ -1,0 +1,63 @@
+<html>
+ <head>
+  <script type="text/javascript">
+    /*******************************************************************
+     CONFIGURATION
+     *******************************************************************/
+    var targets = [
+        {'url':'http://www1.example.com/', 'label':'www1'},
+        {'url':'http://www2.example.com/', 'label':'www2'},
+        {'url':'http://www3.example.com/', 'label':'www3'}
+    ];
+    var googleAnalyticsTrackingCode = null; // 'UA-XXXXXXXXX-1'
+    var colors = ['#ffffff', '#65bc55', '#199dd7'];
+    /*******************************************************************
+     END CONFIGURATION
+     *******************************************************************/
+    function load() {
+        // Cycle background colors
+        var colorSel = 0;
+        setInterval(function() {
+            document.body.style.backgroundColor = colors[colorSel];
+            if (++colorSel >= colors.length) colorSel = 0;
+        }, 1000);
+        // Google Analytics
+        if (googleAnalyticsTrackingCode) {
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+            ga('create', googleAnalyticsTrackingCode, 'auto');
+            ga('send', 'pageview');
+        }
+        // Perform redirect
+        targets.forEach(function(target) {
+            // Request object
+            var httpRequest;
+            if (window.XMLHttpRequest) { // Mozilla, Safari, IE7+ ...
+                httpRequest = new XMLHttpRequest();
+            } else if (window.ActiveXObject) { // IE 6 and older
+                httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            // Redirect on first 200
+            var redirect = target;
+            httpRequest.onreadystatechange = function() {
+                if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
+                    ga('send', 'pageview', 'RD_' + target.label);
+                    window.location = target.url;
+                }
+            };
+            // Make request
+            httpRequest.open('GET', target);
+            httpRequest.send();
+        })
+    }
+    </script>
+  <style type="text/css">
+    body { font-family: Helvetica; font-size: 7em; height: 100%; transition: background-color 1s ease; }
+  </style>
+ </head>
+ <body class="white" onload="load()">
+  Loading..
+ </body>
+</html>
